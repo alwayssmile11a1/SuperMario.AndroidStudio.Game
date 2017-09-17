@@ -7,12 +7,18 @@ import noshanabi.game.Screens.PlayScreen;
 
 //Hello hello
 public class MainClass extends Game {
+
+	public static final int V_WIDTH = 400;
+	public static final int V_HEIGHT = 208;
 	public SpriteBatch batch;
-	
+
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
+
 		setScreen(new PlayScreen(this));
+
 	}
 
 	@Override
@@ -23,5 +29,6 @@ public class MainClass extends Game {
 	@Override
 	public void dispose () {
 		batch.dispose();
+
 	}
 }
