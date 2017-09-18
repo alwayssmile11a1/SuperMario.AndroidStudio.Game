@@ -1,6 +1,7 @@
 package noshanabi.game.Screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -22,6 +23,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import noshanabi.game.MainClass;
 import noshanabi.game.Scenes.Hud;
+import noshanabi.game.Sprites.Mario;
 
 /**
  * Created by 2SMILE2 on 17/09/2017.
@@ -47,9 +49,15 @@ public class PlayScreen implements Screen {
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
 
-    //Box2d variables
+    //World manages physics, collisions,etc.
     private World world;
+
+    //this variable helps us to see the virtual shape of our world (virtual shape of all objects for example)
+    //this variable should be eliminated when public the game
     private Box2DDebugRenderer b2dr;
+
+    //Main Character
+    Mario mario;
 
     //Constructor
     public PlayScreen(MainClass game)
@@ -76,10 +84,14 @@ public class PlayScreen implements Screen {
         renderer = new OrthogonalTiledMapRenderer(map);
 
 
-        world = new World(new Vector2(0,0),true);
+        //Create our World
+        world = new World(new Vector2(0,-10),true);
+
+        //create 2D debug renderer (we can see virtual shape by this)
         b2dr = new Box2DDebugRenderer();
 
-        BodyDef bdef = new BodyDef();
+        //these variables are used for loop below. Since the BodyDef, fDef, Shape and Body can be safely reused, this will optimize our game a little more
+        BodyDef bDef = new BodyDef();
         PolygonShape shape = new PolygonShape();
         FixtureDef fdef = new FixtureDef();
         Body body;
@@ -87,11 +99,13 @@ public class PlayScreen implements Screen {
         //create ground bodies/fixtures
         for(MapObject object : map.getLayers().get(2).getObjects().getByType(RectangleMapObject.class))
         {
+            //create rigid body
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
-            bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX()+rect.getWidth()/2,rect.getY()+rect.getHeight()/2);
+            bDef.type = BodyDef.BodyType.StaticBody;
+            bDef.position.set(rect.getX()+rect.getWidth()/2,rect.getY()+rect.getHeight()/2);
+            body=world.createBody(bDef);
 
-            body=world.createBody(bdef);
+            //create the shape of this body
             shape.setAsBox(rect.getWidth()/2, rect.getHeight()/2);
             fdef.shape = shape;
             body.createFixture(fdef);
@@ -100,11 +114,13 @@ public class PlayScreen implements Screen {
         //create pipe bodies/fixtures
         for(MapObject object : map.getLayers().get(3).getObjects().getByType(RectangleMapObject.class))
         {
+            //create rigid body
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
-            bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX()+rect.getWidth()/2,rect.getY()+rect.getHeight()/2);
+            bDef.type = BodyDef.BodyType.StaticBody;
+            bDef.position.set(rect.getX()+rect.getWidth()/2,rect.getY()+rect.getHeight()/2);
+            body=world.createBody(bDef);
 
-            body=world.createBody(bdef);
+            //create the shape of this body
             shape.setAsBox(rect.getWidth()/2, rect.getHeight()/2);
             fdef.shape = shape;
             body.createFixture(fdef);
@@ -114,10 +130,10 @@ public class PlayScreen implements Screen {
         for(MapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class))
         {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
-            bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX()+rect.getWidth()/2,rect.getY()+rect.getHeight()/2);
+            bDef.type = BodyDef.BodyType.StaticBody;
+            bDef.position.set(rect.getX()+rect.getWidth()/2,rect.getY()+rect.getHeight()/2);
+            body=world.createBody(bDef);
 
-            body=world.createBody(bdef);
             shape.setAsBox(rect.getWidth()/2, rect.getHeight()/2);
             fdef.shape = shape;
             body.createFixture(fdef);
@@ -127,14 +143,17 @@ public class PlayScreen implements Screen {
         for(MapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class))
         {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
-            bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX()+rect.getWidth()/2,rect.getY()+rect.getHeight()/2);
+            bDef.type = BodyDef.BodyType.StaticBody;
+            bDef.position.set(rect.getX()+rect.getWidth()/2,rect.getY()+rect.getHeight()/2);
+            body=world.createBody(bDef);
 
-            body=world.createBody(bdef);
             shape.setAsBox(rect.getWidth()/2, rect.getHeight()/2);
             fdef.shape = shape;
             body.createFixture(fdef);
         }
+
+
+        mario = new Mario(world);
     }
 
     @Override
@@ -144,15 +163,28 @@ public class PlayScreen implements Screen {
 
     public void handleInput(float dt)
     {
-        if(Gdx.input.isTouched())
+        if(Gdx.input.isKeyJustPressed(Input.Keys.UP))
         {
-            gameCam.position.x += 100*dt;
+            mario.b2body.applyLinearImpulse(new Vector2(0,4f),mario.b2body.getWorldCenter(),true);
         }
+
+        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) && mario.b2body.getLinearVelocity().x<=100 ) {
+            mario.b2body.applyLinearImpulse(new Vector2(10f, 0), mario.b2body.getWorldCenter(),true);
+        }
+
+        if(Gdx.input.isKeyPressed(Input.Keys.LEFT) && mario.b2body.getLinearVelocity().x>=-100) {
+            mario.b2body.applyLinearImpulse(new Vector2(-10f, 0), mario.b2body.getWorldCenter(),true);
+        }
+
     }
 
     public void update(float dt)
     {
         handleInput(dt);
+
+        world.step(1/60f,6,2);
+
+        gameCam.position.x = mario.b2body.getPosition().x;
 
         gameCam.update();
 
@@ -171,7 +203,6 @@ public class PlayScreen implements Screen {
         renderer.render();
 
         b2dr.render(world,gameCam.combined);
-
 
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
