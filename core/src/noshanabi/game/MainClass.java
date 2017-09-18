@@ -10,7 +10,7 @@ public class MainClass extends Game {
 
 	public static final int V_WIDTH = 400;
 	public static final int V_HEIGHT = 208;
-	public static final int PPM = 100;
+	public static final float PTM = 100;
 	public SpriteBatch batch;
 
 

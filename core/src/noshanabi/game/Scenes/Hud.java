@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -16,7 +17,7 @@ import noshanabi.game.MainClass;
  * Created by 2SMILE2 on 17/09/2017.
  * Hud manages things like score, health, text, etc.
  */
-public class Hud {
+public class Hud implements Disposable{
 
     public Stage stage;
     private Viewport viewport;
@@ -63,4 +64,8 @@ public class Hud {
     }
 
 
+    @Override
+    public void dispose() {
+        stage.dispose();
+    }
 }
