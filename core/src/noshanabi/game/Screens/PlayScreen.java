@@ -3,6 +3,7 @@ package noshanabi.game.Screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -17,6 +18,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import noshanabi.game.MainClass;
 import noshanabi.game.Scenes.Hud;
+import noshanabi.game.Sprites.Goomba;
 import noshanabi.game.Sprites.Mario;
 import noshanabi.game.Tools.B2WorldCreator;
 import noshanabi.game.Tools.WorldContactListener;
@@ -39,7 +41,7 @@ public class PlayScreen implements Screen {
 
 
     //manage things like score, health, etc
-    private Hud hud;
+    public static Hud hud;
 
     //these variables help to create and render a tiled map
     private TmxMapLoader mapLoader;
@@ -53,8 +55,11 @@ public class PlayScreen implements Screen {
     //this variable should be eliminated when public the game
     private Box2DDebugRenderer b2dr;
 
+    private Music music;
+
     //Main Character
-    Mario mario;
+    private Mario mario;
+    private Goomba goomba;
 
     //Constructor
     public PlayScreen(MainClass game)
@@ -90,11 +95,18 @@ public class PlayScreen implements Screen {
         b2dr = new Box2DDebugRenderer();
 
 
-        new B2WorldCreator(world,map);
+        new B2WorldCreator(this);
 
-        mario = new Mario(world, this);
+        mario = new Mario(this);
 
         world.setContactListener(new WorldContactListener());
+
+        music = MainClass.audioManager.get("audio/music/mario_music.ogg",Music.class);
+        music.setLooping(true);
+        music.setVolume(0.2f);
+
+        music.play();
+        goomba=new Goomba(this,0.64f,0.32f);
     }
 
     @Override
@@ -114,32 +126,44 @@ public class PlayScreen implements Screen {
             mario.b2body.applyLinearImpulse(new Vector2(0,4f),mario.b2body.getWorldCenter(),true);
         }
 
-        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) && mario.b2body.getLinearVelocity().x<=1 ) {
-            mario.b2body.applyLinearImpulse(new Vector2(0.1f, 0), mario.b2body.getWorldCenter(),true);
+
+        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) && mario.b2body.getLinearVelocity().x<=1.5f ) {
+            mario.b2body.applyLinearImpulse(new Vector2(0.15f, 0), mario.b2body.getWorldCenter(),true);
+            System.out.printf("%f %d\n",mario.b2body.getLinearVelocity().x);
+        }
+
+        if(Gdx.input.isKeyPressed(Input.Keys.LEFT) && mario.b2body.getLinearVelocity().x>=-1.5f) {
+            mario.b2body.applyLinearImpulse(new Vector2(-0.15f, 0), mario.b2body.getWorldCenter(),true);
             System.out.printf("%f \n",mario.b2body.getLinearVelocity().x);
         }
 
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT) && mario.b2body.getLinearVelocity().x>=-1) {
-            mario.b2body.applyLinearImpulse(new Vector2(-0.1f, 0), mario.b2body.getWorldCenter(),true);
-            System.out.printf("%f \n",mario.b2body.getLinearVelocity().x);
-        }
+    }
 
+    public TiledMap getMap()
+    {
+        return map;
+    }
+
+    public World getWorld()
+    {
+        return world;
     }
 
     public void update(float dt)
     {
         handleInput(dt);
 
-        world.step(1/60f,6,2);
+        world.step(1/60f ,6,2);
 
         mario.update(dt);
-
+        goomba.update(dt);
         gameCam.position.x = mario.b2body.getPosition().x;
 
         gameCam.update();
 
         renderer.setView(gameCam);
 
+        hud.update(dt);
     }
 
     @Override
@@ -155,6 +179,7 @@ public class PlayScreen implements Screen {
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
         mario.draw(game.batch);
+        goomba.draw(game.batch);
         game.batch.end();
 
 

@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import noshanabi.game.MainClass;
+import noshanabi.game.Screens.PlayScreen;
 
 /**
  * Created by 2SMILE2 on 18/09/2017.
@@ -27,10 +28,10 @@ public abstract class InteractiveTileObject {
     protected Body body;
     protected Fixture fixture;
 
-    public InteractiveTileObject(World world, TiledMap map, Rectangle bounds)
+    public InteractiveTileObject(PlayScreen screen, Rectangle bounds)
     {
-        this.world = world;
-        this.map = map;
+        this.world = screen.getWorld();
+        this.map = screen.getMap();
         this.bounds = bounds;
 
         BodyDef bDef = new BodyDef();

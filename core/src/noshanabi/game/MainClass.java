@@ -1,6 +1,9 @@
 package noshanabi.game;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import noshanabi.game.Screens.PlayScreen;
@@ -17,6 +20,11 @@ public class MainClass extends Game {
 	public static final short BRICK_BIT = 4;
 	public static final short COIN_BIT = 8;
 	public static final short DESTROYED_BIT = 16;
+	public static final short OBJECT_BIT = 32;
+	public static final short ENEMY_BIT = 64;
+	public static final short ENEMY_HEAD_BIT = 128;
+
+	public static AssetManager audioManager;
 
 	public SpriteBatch batch;
 
@@ -25,6 +33,12 @@ public class MainClass extends Game {
 	public void create () {
 		batch = new SpriteBatch();
 
+		audioManager = new AssetManager();
+		audioManager.load("audio/music/mario_music.ogg", Music.class);
+		audioManager.load("audio/sounds/coin.wav",Sound.class);
+		audioManager.load("audio/sounds/bump.wav",Sound.class);
+		audioManager.load("audio/sounds/breakblock.wav",Sound.class);
+		audioManager.finishLoading();
 		setScreen(new PlayScreen(this));
 
 	}
@@ -32,11 +46,13 @@ public class MainClass extends Game {
 	@Override
 	public void render () {
 		super.render();
+		audioManager.update();
 	}
 	
 	@Override
 	public void dispose () {
+		super.dispose();
 		batch.dispose();
-
+		audioManager.dispose();
 	}
 }

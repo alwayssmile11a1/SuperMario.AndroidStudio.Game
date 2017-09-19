@@ -1,11 +1,14 @@
 package noshanabi.game.Tools;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
+import noshanabi.game.MainClass;
+import noshanabi.game.Sprites.Enemy;
 import noshanabi.game.Sprites.InteractiveTileObject;
 
 /**
@@ -20,6 +23,8 @@ import noshanabi.game.Sprites.InteractiveTileObject;
         Fixture fixA = contact.getFixtureA();
         Fixture fixB = contact.getFixtureB();
 
+        int cDef = fixA.getFilterData().categoryBits|fixB.getFilterData().categoryBits;
+
         if(fixA.getUserData()=="head"||fixB.getUserData()=="head")
         {
             Fixture head =fixA.getUserData() == "head"?fixA:fixB;
@@ -31,6 +36,33 @@ import noshanabi.game.Sprites.InteractiveTileObject;
 
             }
         }
+
+        switch (cDef)
+        {
+            case MainClass.ENEMY_HEAD_BIT|MainClass.MARIO_BIT:
+                if(fixA.getFilterData().categoryBits==MainClass.ENEMY_HEAD_BIT)
+                {
+                    ((Enemy)(fixA.getUserData())).hitOnHead();
+                }
+                else
+                {
+                        ((Enemy)(fixB.getUserData())).hitOnHead();
+                }
+                break;
+            case MainClass.ENEMY_BIT| MainClass.OBJECT_BIT:
+                if(fixA.getFilterData().categoryBits==MainClass.ENEMY_BIT)
+                {
+                    ((Enemy)(fixA.getUserData())).reverseVelocity(true,false);
+                }
+                else
+                {
+                        ((Enemy)(fixB.getUserData())).reverseVelocity(true,false);
+                }
+                break;
+            case MainClass.MARIO_BIT|MainClass.ENEMY_BIT:
+                Gdx.app.log("MARIO","DIED");
+        }
+
     }
 
     @Override

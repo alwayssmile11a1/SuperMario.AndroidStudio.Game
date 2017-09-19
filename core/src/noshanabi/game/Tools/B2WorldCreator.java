@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import noshanabi.game.MainClass;
+import noshanabi.game.Screens.PlayScreen;
 import noshanabi.game.Sprites.Brick;
 import noshanabi.game.Sprites.Coin;
 
@@ -19,8 +20,10 @@ import noshanabi.game.Sprites.Coin;
  */
 
 public class B2WorldCreator {
-    public B2WorldCreator(World world, TiledMap map)
+    public B2WorldCreator(PlayScreen screen)
     {
+        World world = screen.getWorld();
+        TiledMap map = screen.getMap();
         //these variables are used for loop below. Since the BodyDef, fDef, Shape and Body can be safely reused, this will optimize our game a little more
         BodyDef bDef = new BodyDef();
         PolygonShape shape = new PolygonShape();
@@ -54,6 +57,7 @@ public class B2WorldCreator {
             //create the shape of this body
             shape.setAsBox(rect.getWidth()/2/MainClass.PTM, rect.getHeight()/2/MainClass.PTM);
             fdef.shape = shape;
+            fdef.filter.categoryBits = MainClass.OBJECT_BIT;
             body.createFixture(fdef);
         }
 
@@ -61,7 +65,7 @@ public class B2WorldCreator {
         for(MapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class))
         {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
-            new Brick(world,map,rect);
+            new Brick(screen,rect);
         }
 
         //create coin bodies/fixtures
@@ -69,7 +73,7 @@ public class B2WorldCreator {
         {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
 
-            new Coin(world,map,rect);
+            new Coin(screen,rect);
         }
 
 
