@@ -3,9 +3,11 @@ package noshanabi.game.Sprites;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
@@ -69,16 +71,29 @@ public class Mario extends Sprite {
 
     public void defineMario()
     {
+        //create body (center mass of body, body type)
         BodyDef bDef = new BodyDef();
         bDef.position.set(32/ MainClass.PTM,32/MainClass.PTM);
         bDef.type = BodyDef.BodyType.DynamicBody;
         b2body = world.createBody(bDef);
 
+        //create the shape of body
         FixtureDef fDef = new FixtureDef();
         CircleShape shape = new CircleShape();
         shape.setRadius(6/ MainClass.PTM);
+        fDef.filter.categoryBits = MainClass.MARIO_BIT;
+        fDef.filter.maskBits = MainClass.DEFAULT_BIT|MainClass.COIN_BIT|MainClass.BRICK_BIT;
+
         fDef.shape = shape;
         b2body.createFixture(fDef);
+
+        //the top sensor of mario
+        EdgeShape head = new EdgeShape();
+        head.set(new Vector2(-2/MainClass.PTM,6/MainClass.PTM),new Vector2(2/MainClass.PTM,6/MainClass.PTM));
+        fDef.shape = head;
+        fDef.isSensor =true;
+        b2body.createFixture(fDef).setUserData("head");
+
     }
 
     public void update(float dt)
