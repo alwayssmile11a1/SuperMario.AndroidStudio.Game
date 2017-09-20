@@ -2,11 +2,12 @@ package noshanabi.game.Sprites;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileSet;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.math.Vector2;
 
+import noshanabi.game.Item.ItemDef;
+import noshanabi.game.Item.Mushroom;
 import noshanabi.game.MainClass;
 import noshanabi.game.Screens.PlayScreen;
 
@@ -36,6 +37,7 @@ public class Coin extends InteractiveTileObject {
         else
         {
             MainClass.audioManager.get("audio/sounds/coin.wav", Sound.class).play();
+            screen.spawnItem(new ItemDef(new Vector2(body.getPosition().x,body.getPosition().y+16/MainClass.PTM), Mushroom.class));
         }
         getCell().setTile(tileSet.getTile(BLANK_COIN));
         PlayScreen.hud.addScore(100);

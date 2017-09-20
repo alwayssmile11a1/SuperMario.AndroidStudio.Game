@@ -9,17 +9,22 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 
 import noshanabi.game.MainClass;
 import noshanabi.game.Screens.PlayScreen;
 import noshanabi.game.Sprites.Brick;
 import noshanabi.game.Sprites.Coin;
+import noshanabi.game.Sprites.Goomba;
 
 /**
  * Created by 2SMILE2 on 18/09/2017.
  */
 
 public class B2WorldCreator {
+
+    private Array<Goomba> goombas;
+
     public B2WorldCreator(PlayScreen screen)
     {
         World world = screen.getWorld();
@@ -42,6 +47,7 @@ public class B2WorldCreator {
             //create the shape of this body
             shape.setAsBox(rect.getWidth()/2/MainClass.PTM, rect.getHeight()/2/MainClass.PTM);
             fdef.shape = shape;
+            fdef.filter.categoryBits = MainClass.DEFAULT_BIT;
             body.createFixture(fdef);
         }
 
@@ -76,6 +82,18 @@ public class B2WorldCreator {
             new Coin(screen,rect);
         }
 
+        //create all goombas
+        goombas = new Array<Goomba>();
+        for(MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class))
+        {
+            Rectangle rect = ((RectangleMapObject) object).getRectangle();
 
+            goombas.add(new Goomba(screen,rect.getX()/MainClass.PTM,rect.getY()/MainClass.PTM));
+        }
     }
+
+    public Array<Goomba> getGoombas() {
+        return goombas;
+    }
+
 }

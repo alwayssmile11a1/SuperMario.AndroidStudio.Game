@@ -7,9 +7,11 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
+import noshanabi.game.Item.Item;
 import noshanabi.game.MainClass;
 import noshanabi.game.Sprites.Enemy;
 import noshanabi.game.Sprites.InteractiveTileObject;
+import noshanabi.game.Sprites.Mario;
 
 /**
  * Created by 2SMILE2 on 18/09/2017.
@@ -61,6 +63,31 @@ import noshanabi.game.Sprites.InteractiveTileObject;
                 break;
             case MainClass.MARIO_BIT|MainClass.ENEMY_BIT:
                 Gdx.app.log("MARIO","DIED");
+                break;
+            case MainClass.ENEMY_BIT|MainClass.ENEMY_BIT:
+                ((Enemy)(fixA.getUserData())).reverseVelocity(true,false);
+                ((Enemy)(fixB.getUserData())).reverseVelocity(true,false);
+                break;
+            case MainClass.ITEM_BIT| MainClass.OBJECT_BIT:
+                if(fixA.getFilterData().categoryBits==MainClass.ITEM_BIT)
+                {
+                    ((Item)(fixA.getUserData())).reverseVelocity(true,false);
+                }
+                else
+                {
+                    ((Item)(fixB.getUserData())).reverseVelocity(true,false);
+                }
+                break;
+            case MainClass.ITEM_BIT| MainClass.MARIO_BIT:
+                if(fixA.getFilterData().categoryBits==MainClass.ITEM_BIT)
+                {
+                    ((Item)(fixA.getUserData())).use((Mario) fixB.getUserData());
+                }
+                else
+                {
+                    ((Item)(fixB.getUserData())).use((Mario) fixA.getUserData());
+                }
+                break;
         }
 
     }

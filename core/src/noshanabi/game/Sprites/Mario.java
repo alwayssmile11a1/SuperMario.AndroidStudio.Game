@@ -82,7 +82,7 @@ public class Mario extends Sprite {
         CircleShape shape = new CircleShape();
         shape.setRadius(6/ MainClass.PTM);
         fDef.filter.categoryBits = MainClass.MARIO_BIT;
-        fDef.filter.maskBits = MainClass.DEFAULT_BIT|MainClass.COIN_BIT|MainClass.BRICK_BIT|MainClass.ENEMY_BIT|MainClass.OBJECT_BIT|MainClass.ENEMY_HEAD_BIT;
+        fDef.filter.maskBits = MainClass.ITEM_BIT|MainClass.DEFAULT_BIT|MainClass.COIN_BIT|MainClass.BRICK_BIT|MainClass.ENEMY_BIT|MainClass.OBJECT_BIT|MainClass.ENEMY_HEAD_BIT;
 
         fDef.shape = shape;
         b2body.createFixture(fDef);

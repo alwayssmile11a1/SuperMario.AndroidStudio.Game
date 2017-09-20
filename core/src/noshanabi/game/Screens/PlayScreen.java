@@ -13,12 +13,18 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import java.util.concurrent.LinkedBlockingQueue;
+
+import noshanabi.game.Item.Item;
+import noshanabi.game.Item.ItemDef;
+import noshanabi.game.Item.Mushroom;
 import noshanabi.game.MainClass;
 import noshanabi.game.Scenes.Hud;
-import noshanabi.game.Sprites.Goomba;
+import noshanabi.game.Sprites.Enemy;
 import noshanabi.game.Sprites.Mario;
 import noshanabi.game.Tools.B2WorldCreator;
 import noshanabi.game.Tools.WorldContactListener;
@@ -59,7 +65,11 @@ public class PlayScreen implements Screen {
 
     //Main Character
     private Mario mario;
-    private Goomba goomba;
+
+    private B2WorldCreator creator;
+
+    private Array<Item> items;
+    private LinkedBlockingQueue<ItemDef> itemsToSpawn;
 
     //Constructor
     public PlayScreen(MainClass game)
@@ -95,7 +105,7 @@ public class PlayScreen implements Screen {
         b2dr = new Box2DDebugRenderer();
 
 
-        new B2WorldCreator(this);
+        creator = new B2WorldCreator(this);
 
         mario = new Mario(this);
 
@@ -106,7 +116,26 @@ public class PlayScreen implements Screen {
         music.setVolume(0.2f);
 
         music.play();
-        goomba=new Goomba(this,0.64f,0.32f);
+
+        items = new Array<Item>();
+        itemsToSpawn = new LinkedBlockingQueue<ItemDef>();
+    }
+
+    public void spawnItem(ItemDef idef)
+    {
+        itemsToSpawn.add(idef);
+    }
+
+    public void handleSpawningItems()
+    {
+        if(!itemsToSpawn.isEmpty())
+        {
+            ItemDef idef = itemsToSpawn.poll();
+            if(idef.type== Mushroom.class)
+            {
+                items.add(new Mushroom(this, idef.position.x, idef.position.y));
+            }
+        }
     }
 
     @Override
@@ -129,7 +158,7 @@ public class PlayScreen implements Screen {
 
         if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) && mario.b2body.getLinearVelocity().x<=1.5f ) {
             mario.b2body.applyLinearImpulse(new Vector2(0.15f, 0), mario.b2body.getWorldCenter(),true);
-            System.out.printf("%f %d\n",mario.b2body.getLinearVelocity().x);
+            System.out.printf("%f \n",mario.b2body.getLinearVelocity().x);
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.LEFT) && mario.b2body.getLinearVelocity().x>=-1.5f) {
@@ -152,11 +181,25 @@ public class PlayScreen implements Screen {
     public void update(float dt)
     {
         handleInput(dt);
+        handleSpawningItems();
 
         world.step(1/60f ,6,2);
 
         mario.update(dt);
-        goomba.update(dt);
+
+        for(Enemy enemy :creator.getGoombas()) {
+            enemy.update(dt);
+            if(enemy.getX()<mario.getX()+ 3 && !enemy.b2body.isActive())
+            {
+                enemy.b2body.setActive(true);
+            }
+        }
+
+        for(Item item:items)
+        {
+            item.update(dt);
+        }
+
         gameCam.position.x = mario.b2body.getPosition().x;
 
         gameCam.update();
@@ -179,7 +222,15 @@ public class PlayScreen implements Screen {
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
         mario.draw(game.batch);
-        goomba.draw(game.batch);
+        for(Enemy enemy :creator.getGoombas()) {
+            enemy.draw(game.batch);
+        }
+
+        for(Item item:items)
+        {
+            item.draw(game.batch);
+        }
+
         game.batch.end();
 
 

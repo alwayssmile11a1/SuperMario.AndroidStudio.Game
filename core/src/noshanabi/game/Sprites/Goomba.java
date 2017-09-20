@@ -43,6 +43,7 @@ public class Goomba extends Enemy {
 
     }
 
+    @Override
     public void update(float dt)
     {
         stateTime+=dt;
@@ -97,6 +98,7 @@ public class Goomba extends Enemy {
         fDef.filter.categoryBits = MainClass.ENEMY_HEAD_BIT;
         b2body.createFixture(fDef).setUserData(this);
 
+        b2body.setActive(false);
     }
 
     @Override
