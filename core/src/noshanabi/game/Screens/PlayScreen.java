@@ -166,6 +166,8 @@ public class PlayScreen implements Screen {
             System.out.printf("%f \n",mario.b2body.getLinearVelocity().x);
         }
 
+
+
     }
 
     public TiledMap getMap()

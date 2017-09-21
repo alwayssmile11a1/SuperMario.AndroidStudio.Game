@@ -27,20 +27,20 @@ import noshanabi.game.Sprites.Mario;
 
         int cDef = fixA.getFilterData().categoryBits|fixB.getFilterData().categoryBits;
 
-        if(fixA.getUserData()=="head"||fixB.getUserData()=="head")
-        {
-            Fixture head =fixA.getUserData() == "head"?fixA:fixB;
-            Fixture object = head == fixA?fixB:fixA;
-
-            if(object.getUserData() instanceof InteractiveTileObject)
-            {
-                ((InteractiveTileObject) object.getUserData()).onHeadHit();
-
-            }
-        }
 
         switch (cDef)
         {
+            case MainClass.MARIO_HEAD_BIT|MainClass.BRICK_BIT:
+            case MainClass.MARIO_HEAD_BIT|MainClass.COIN_BIT:
+                if(fixA.getFilterData().categoryBits==MainClass.MARIO_HEAD_BIT)
+                {
+                    ((InteractiveTileObject) fixB.getUserData()).onHeadHit((Mario) fixA.getUserData());
+                }
+                else
+                {
+                    ((InteractiveTileObject) fixA.getUserData()).onHeadHit((Mario) fixB.getUserData());
+                }
+                break;
             case MainClass.ENEMY_HEAD_BIT|MainClass.MARIO_BIT:
                 if(fixA.getFilterData().categoryBits==MainClass.ENEMY_HEAD_BIT)
                 {

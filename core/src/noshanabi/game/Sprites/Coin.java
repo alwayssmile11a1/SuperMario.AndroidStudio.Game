@@ -2,8 +2,8 @@ package noshanabi.game.Sprites;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.tiled.TiledMapTileSet;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import noshanabi.game.Item.ItemDef;
@@ -19,16 +19,16 @@ public class Coin extends InteractiveTileObject {
 
     private static TiledMapTileSet tileSet;
     private final int BLANK_COIN = 28;
-    public Coin(PlayScreen screen, Rectangle bounds)
+    public Coin(PlayScreen screen, MapObject object)
     {
-        super(screen,bounds);
+        super(screen,object);
         tileSet = map.getTileSets().getTileSet("tileset_gutter");
         fixture.setUserData(this);
         setCategoryFilter(MainClass.COIN_BIT);
     }
 
     @Override
-    public void onHeadHit() {
+    public void onHeadHit(Mario mario) {
         Gdx.app.log("Coin","Collision");
         if(getCell().getTile().getId() == BLANK_COIN)
         {
@@ -36,11 +36,14 @@ public class Coin extends InteractiveTileObject {
         }
         else
         {
-            MainClass.audioManager.get("audio/sounds/coin.wav", Sound.class).play();
-            screen.spawnItem(new ItemDef(new Vector2(body.getPosition().x,body.getPosition().y+16/MainClass.PTM), Mushroom.class));
+            if(object.getProperties().containsKey("mushroom")) {
+                MainClass.audioManager.get("audio/sounds/coin.wav", Sound.class).play();
+                screen.spawnItem(new ItemDef(new Vector2(body.getPosition().x, body.getPosition().y + 16 / MainClass.PTM), Mushroom.class));
+            }
+            getCell().setTile(tileSet.getTile(BLANK_COIN));
+            PlayScreen.hud.addScore(100);
         }
-        getCell().setTile(tileSet.getTile(BLANK_COIN));
-        PlayScreen.hud.addScore(100);
+
 
 
     }
