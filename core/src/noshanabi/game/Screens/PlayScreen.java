@@ -121,6 +121,16 @@ public class PlayScreen implements Screen {
         itemsToSpawn = new LinkedBlockingQueue<ItemDef>();
     }
 
+    public boolean gameOver()
+    {
+        if(mario.currentState==Mario.State.DEAD && mario.getStateTimer()>3)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+
     public void spawnItem(ItemDef idef)
     {
         itemsToSpawn.add(idef);
@@ -150,6 +160,7 @@ public class PlayScreen implements Screen {
 
     public void handleInput(float dt)
     {
+        if(mario.currentState == Mario.State.DEAD) return;
         if(Gdx.input.isKeyJustPressed(Input.Keys.UP))
         {
             mario.b2body.applyLinearImpulse(new Vector2(0,4f),mario.b2body.getWorldCenter(),true);
@@ -202,7 +213,9 @@ public class PlayScreen implements Screen {
             item.update(dt);
         }
 
-        gameCam.position.x = mario.b2body.getPosition().x;
+        if(mario.currentState != Mario.State.DEAD) {
+            gameCam.position.x = mario.b2body.getPosition().x;
+        }
 
         gameCam.update();
 
@@ -240,6 +253,13 @@ public class PlayScreen implements Screen {
 
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
+
+        if(gameOver())
+        {
+            game.setScreen(new GameOverScreen(game));
+            dispose();
+        }
+
     }
 
     @Override

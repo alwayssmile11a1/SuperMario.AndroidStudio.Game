@@ -1,6 +1,5 @@
 package noshanabi.game.Tools;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -62,7 +61,14 @@ import noshanabi.game.Sprites.Mario;
                 }
                 break;
             case MainClass.MARIO_BIT|MainClass.ENEMY_BIT:
-                Gdx.app.log("MARIO","DIED");
+                if(fixA.getFilterData().categoryBits==MainClass.MARIO_BIT)
+                {
+                    ((Mario) fixA.getUserData()).hit();
+                }
+                else
+                {
+                     ((Mario) fixB.getUserData()).hit();
+                }
                 break;
             case MainClass.ENEMY_BIT|MainClass.ENEMY_BIT:
                 ((Enemy)(fixA.getUserData())).reverseVelocity(true,false);

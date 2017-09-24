@@ -15,6 +15,7 @@ public class MainClass extends Game {
 	public static final int V_HEIGHT = 208;
 	public static final float PTM = 100;
 
+	public static final short NOTHING_BIT = 0;
 	public static final short DEFAULT_BIT = 1;
 	public static final short MARIO_BIT = 2;
 	public static final short BRICK_BIT = 4;
@@ -41,6 +42,9 @@ public class MainClass extends Game {
 		audioManager.load("audio/sounds/bump.wav",Sound.class);
 		audioManager.load("audio/sounds/breakblock.wav",Sound.class);
 		audioManager.load("audio/sounds/powerup.wav",Sound.class);
+		audioManager.load("audio/sounds/powerdown.wav",Sound.class);
+		audioManager.load("audio/sounds/stomp.wav",Sound.class);
+		audioManager.load("audio/sounds/mariodie.wav",Sound.class);
 		audioManager.finishLoading();
 		setScreen(new PlayScreen(this));
 
